@@ -1,102 +1,169 @@
-import { DevTool } from "@hookform/devtools";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import z from "zod";
+import z, { json } from "zod";
 
-const schema = z.object({
-  username: z
+const feedbackSchema = z.object({
+  firstName: z
     .string()
-    .min(1, "მინიმუმ 1 სიმბოლო უნდა გამოიყენო")
-    .max(20, "მაქსიმუმ 20 სიმბოლო უნდა გამოიყენო"),
-  lastname: z
+    .min(2, "First name must be at least 2 characters")
+    .max(99, "First name too long"),
+
+  lastName: z
     .string()
-    .min(1, "მინიმუმ 1 სიმბოლო უნდა გამოიყენო")
-    .max(20, "მაქსიმუმ 20 სიმბოლო უნდა გამოიყენო"),
+    .min(2, "Last name must be at least 2 characters")
+    .max(99, "Last name too long"),
+
+  email: z
+    .email("Invalid email address")
+    .refine((value) => value !== "tester@example.com", {
+      message: "This email is reserved, please use another",
+    })
+    .refine(
+      (value) => {
+        const domain = value.split("@")[1];
+        const blacklist = [
+          "baddomain.com",
+          "bademail.com",
+          "mail.ru",
+          "test.ru",
+        ];
+        return !blacklist.includes(domain);
+      },
+      { message: "Blacklisted email domain" }
+    ),
+
+  phoneNumber: z
+    .string()
+    .min(7, "Phone number too short")
+    .max(20, "Phone number too long")
+    .regex(/^\+?[0-9\s-]+$/, "Invalid phone number format"),
+
+  description: z
+    .string()
+    .min(10, "Description must be at least 10 characters")
+    .max(1000, "Description too long"),
 });
 
 const RegisterForm = () => {
+  // react-hook-form
   const {
     register,
     handleSubmit,
-    control,
-    formState: { errors },
+    reset,
+    formState: { errors, isSubmitting },
   } = useForm({
-    resolver: zodResolver(schema),
-
+    resolver: zodResolver(feedbackSchema),
     defaultValues: {
-      username: "",
-      lastname: "",
+      firstName: "",
+      lastName: "",
+      email: "",
+      phoneNumber: "",
+      description: "",
     },
   });
 
-  const formSubmit = (data) => {
-    console.log("Form Data : ", data);
+  const onSubmit = (data) => {
+    fetch("https://68f26ef5b36f9750deeca098.mockapi.io/feedback", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`Server errors : ${res.status}`);
+        }
+        return res.json();
+      })
+      .then((responseData) => {
+        console.log("Succesfully submited", responseData);
+      })
+      .catch((err) => {
+        console.error(`Submition failed ${err}`);
+      });
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
+    <div className="flex justify-center items-center min-h-screen bg-gray-50">
       <form
-        onSubmit={handleSubmit(formSubmit)}
-        className="bg-white p-6 rounded shadow-md w-full max-w-sm"
+        className="bg-white p-6 rounded shadow-md w-full max-w-md"
+        onSubmit={handleSubmit(onSubmit)}
       >
-        <h2 className="text-2x1 font-bold mb-4">register</h2>
+        <h2 className="text-2xl font-bold mb-4 text-center">Send Feedback</h2>
 
-        <div>
-          <label
-            htmlFor="username"
-            className="block text-gray-700 text-sm font-bold mb-2"
-          >
-            username
-          </label>
+        {/* First Name */}
+        <div className="mb-3">
+          <label className="block text-sm font-medium mb-1">First Name</label>
           <input
             type="text"
-            id="username"
-            {...register("username")}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            {...register("firstName")}
+            className="border rounded w-full p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
-          <div>
-            <p>
-              {errors.username && (
-                <span className="text-red-500 text-xs italic">
-                  {errors.username.message}
-                </span>
-              )}
-            </p>
-          </div>
+          {errors.firstName && (
+            <p className="text-red-500 text-xs">{errors.firstName.message}</p>
+          )}
         </div>
 
-        <div>
-          <label
-            htmlFor="lastname"
-            className="block text-gray-700 text-sm font-bold mb-2"
-          >
-            lastname
-          </label>
+        {/* Last Name */}
+        <div className="mb-3">
+          <label className="block text-sm font-medium mb-1">Last Name</label>
           <input
             type="text"
-            id="lastname"
-            {...register("lastname")}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4"
+            {...register("lastName")}
+            className="border rounded w-full p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
-          <div>
-            <p>
-              {errors.lastname && (
-                <span className="text-red-500 text-xs italic">
-                  {errors.lastname.message}
-                </span>
-              )}
-            </p>
-          </div>
+          {errors.lastName && (
+            <p className="text-red-500 text-xs">{errors.lastName.message}</p>
+          )}
         </div>
 
+        {/* Email */}
+        <div className="mb-3">
+          <label className="block text-sm font-medium mb-1">Email</label>
+          <input
+            type="email"
+            {...register("email")}
+            className="border rounded w-full p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
+          {errors.email && (
+            <p className="text-red-500 text-xs">{errors.email.message}</p>
+          )}
+        </div>
+
+        {/* Phone */}
+        <div className="mb-3">
+          <label className="block text-sm font-medium mb-1">Phone Number</label>
+          <input
+            type="tel"
+            {...register("phoneNumber")}
+            className="border rounded w-full p-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
+          {errors.phoneNumber && (
+            <p className="text-red-500 text-xs">{errors.phoneNumber.message}</p>
+          )}
+        </div>
+
+        {/* Description */}
+        <div className="mb-3">
+          <label className="block text-sm font-medium mb-1">Description</label>
+          <textarea
+            rows={4}
+            {...register("description")}
+            className="border rounded w-full p-2 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
+          />
+          {errors.description && (
+            <p className="text-red-500 text-xs">{errors.description.message}</p>
+          )}
+        </div>
+
+        {/* Submit Button */}
         <button
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
           type="submit"
+          disabled={isSubmitting}
+          className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded w-full"
         >
-          register
+          {isSubmitting ? "Submitting..." : "Submit Feedback"}
         </button>
       </form>
-      <DevTool control={control} />
     </div>
   );
 };
