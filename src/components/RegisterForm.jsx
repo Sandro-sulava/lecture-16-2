@@ -63,7 +63,7 @@ const RegisterForm = () => {
   });
 
   const onSubmit = (data) => {
-    fetch("https://68f26ef5b36f9750deeca098.mockapi.io/feedback", {
+    fetch("https://jsonplaceholder.typicode.com/users", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
