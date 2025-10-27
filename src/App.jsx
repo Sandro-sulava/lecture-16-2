@@ -1,23 +1,38 @@
-import { NavLink, Route, Routes } from "react-router-dom";
-import RegisterForm from "./components/RegisterForm";
-import FeedBackList from "./components/FeedBackList";
-import FeedBackDetails from "./components/FeedBackDetails";
+import { Routes, Route } from "react-router-dom";
+import Home from "./pages/Home";
+import Register from "./pages/Register";
+import Login from "./pages/Login";
 
-const App = () => {
+import PrivateRoute from "./routes/PrivateRoute";
+import PublicRoute from "./routes/PublicRoute";
+import Header from "./component/Header";
+
+function App() {
   return (
-    <div>
-      <nav className="flex gap-4 p-4 bg-gray-500 mb-10">
-        <NavLink to="/">Submit</NavLink>
-        <NavLink to="/feedbacks">Feedbacks</NavLink>
-      </nav>
+    <div className="min-h-screen bg-gray-50 font-noto">
+      <Header />
+      <main className="max-w-4xl mx-auto">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login />} />
 
-      <Routes>
-        <Route path="/" element={<RegisterForm />} />
-        <Route path="/feedbacks" element={<FeedBackList />} />
-        <Route path="/feedbbacks/:id" element={<FeedBackDetails />} />
-      </Routes>
+          {/* 404 Route */}
+          <Route
+            path="*"
+            element={
+              <div className="text-center">
+                <h1 className="text-3xl font-bold">404 Not Found</h1>
+                <p className="text-gray-500">
+                  The page you are looking for does not exist.
+                </p>
+              </div>
+            }
+          />
+        </Routes>
+      </main>
     </div>
   );
-};
+}
 
 export default App;
