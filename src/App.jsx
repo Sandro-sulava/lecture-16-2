@@ -6,6 +6,9 @@ import Login from "./pages/Login";
 import PrivateRoute from "./routes/PrivateRoute";
 import PublicRoute from "./routes/PublicRoute";
 import Header from "./component/Header";
+import LuxuryCarPage from "./pages/LuxuryCarPage";
+import LuxuryCarDetails from "./pages/LuxuryCarDetails";
+import CreateLuxuryCar from "./pages/CreateLuxuryCar";
 
 function App() {
   return (
@@ -14,8 +17,36 @@ function App() {
       <main className="max-w-4xl mx-auto">
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/login" element={<Login />} />
+
+          <Route
+            path="/register"
+            element={
+              <PublicRoute>
+                <Register />
+              </PublicRoute>
+            }
+          />
+          <Route
+            path="/login"
+            element={
+              <PublicRoute>
+                <Login />
+              </PublicRoute>
+            }
+          />
+
+          <Route path="/luxuryCars" element={<LuxuryCarPage />} />
+
+          <Route path="/luxuryCars/:id" element={<LuxuryCarDetails />} />
+
+          <Route
+            path="/add-car"
+            element={
+              <PrivateRoute>
+                <CreateLuxuryCar />
+              </PrivateRoute>
+            }
+          />
 
           {/* 404 Route */}
           <Route
