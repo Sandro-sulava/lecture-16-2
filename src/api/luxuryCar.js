@@ -31,3 +31,13 @@ export async function createLuxuryCar(data) {
 
   return handleResponse(res);
 }
+
+// Delete Api
+export async function deleteLuxuryCar(id) {
+  const res = await fetch(`${API_BASE}/luxuryCar/3`, {
+    method: "DELETE",
+    credentials: "include",
+  });
+
+  return handleResponse(res);
+}
