@@ -20,7 +20,7 @@ export async function getLuxuryCarById(id) {
 }
 
 // ✅ Create a new luxury car
-
+//https://el-car-server-test.onrender.com/api/luxuryCar/createLuxuryCar
 export async function createLuxuryCar(data) {
   const res = await fetch(`${API_BASE}/luxuryCar/createLuxuryCar`, {
     method: "POST",
@@ -33,9 +33,8 @@ export async function createLuxuryCar(data) {
 }
 
 // Delete Api
-
 export async function deleteLuxuryCar(id) {
-  const res = await fetch(`${API_BASE}/luxuryCar/${id}`, {
+  const res = await fetch(`${API_BASE}/luxuryCar/3`, {
     method: "DELETE",
     credentials: "include",
   });
